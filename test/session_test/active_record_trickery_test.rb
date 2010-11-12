@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper.rb'
+require File.expand_path('../../test_helper.rb', __FILE__)
 
 module SessionTest
   module ActiveRecordTrickeryTest
@@ -29,7 +29,7 @@ module SessionTest
       
       def test_to_model
         session = UserSession.new
-        assert session, session.to_model
+        assert session, session.to_model.to_s
       end
     end
   end
