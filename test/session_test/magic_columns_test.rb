@@ -23,7 +23,7 @@ module SessionTest
         ben.reload
         assert ben.last_request_at != old_last_request_at
       end
-    
+
       def test_valid_increase_failed_login_count
         ben = users(:ben)
         old_failed_login_count = ben.failed_login_count
@@ -57,6 +57,47 @@ module SessionTest
         assert_equal old_current_login_ip, ben.last_login_ip
         assert_equal "1.1.1.1", ben.current_login_ip
       end
+
+			def test_set_last_login_at_if_allowed
+				# login ben
+        ben = users(:ben)
+        UserSession.create(:login => ben.login, :password => "benrocks")
+				
+				# login again, remember last login
+        old_last_login = ben.last_login_at
+        UserSession.create(ben.reload)
+
+        ben.reload
+        assert ben.last_login_at != old_last_login
+			end
     end
+
+		class UpdateInfoNotAllowedTest < ActiveSupport::TestCase
+			
+			def setup
+				class << controller
+					def update_info_allowed?; false; end
+				end				
+			end
+			
+			def test_dont_set_last_login_at_if_not_allowed
+				# login ben
+        ben = users(:ben)
+        UserSession.create(:login => ben.login, :password => "benrocks")
+				
+				# login again, remember last login
+        old_last_login = ben.last_login_at
+        UserSession.create(ben.reload)
+
+        ben.reload
+        assert ben.last_login_at != old_last_login
+			end
+			
+			def teardown
+				class << controller
+					undef :update_info_allowed?
+				end
+			end
+		end
   end
 end

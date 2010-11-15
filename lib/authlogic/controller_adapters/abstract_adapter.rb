@@ -57,6 +57,15 @@ module Authlogic
       def last_request_update_allowed?
         controller.send(:last_request_update_allowed?)
       end
+
+      def responds_to_update_info_allowed?
+        controller.respond_to?(:update_info_allowed?, true)
+      end
+      
+      def update_info_allowed?
+        controller.send(:update_info_allowed?)
+      end
+
       
       private
         def method_missing(id, *args, &block)

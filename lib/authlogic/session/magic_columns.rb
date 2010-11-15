@@ -17,7 +17,7 @@ module Authlogic
           include InstanceMethods
           after_persisting :set_last_request_at, :if => :set_last_request_at?
           validate :increase_failed_login_count
-          before_save :update_info
+          before_save :update_info, :if => :update_info?
           before_save :set_last_request_at, :if => :set_last_request_at?
         end
       end
@@ -46,7 +46,12 @@ module Authlogic
               attempted_record.failed_login_count += 1
             end
           end
-        
+        	
+					def update_info?
+						return controller.update_info_allowed? if controller.responds_to_update_info_allowed?
+						true
+					end
+					
           def update_info
             record.login_count = (record.login_count.blank? ? 1 : record.login_count + 1) if record.respond_to?(:login_count)
             record.failed_login_count = 0 if record.respond_to?(:failed_login_count)
